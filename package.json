@@ -1,0 +1,15 @@
+{
+  "name": "unit-converter",
+  "version": "1.0.0",
+  "description": "CLI unit converter for length, mass, and temperature",
+  "type": "module",
+  "bin": {
+    "conv": "./bin/conv.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
