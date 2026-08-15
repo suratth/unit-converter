@@ -1,0 +1,38 @@
+# devbase 共通 CI テンプレート
+#
+# 使い方:
+#   1. このファイルを consumer リポの .github/workflows/ci.yml にコピーする
+#   2. devbase リポ(suratth/devbase、private)側の
+#      Settings → Actions → General → Access で
+#      「Accessible from repositories in the 'suratth' organization/account」等、
+#      このリポからの呼び出しを許可する設定が前提(private → private の
+#      reusable workflow 参照には呼び出し元の許可設定が必要)
+#   3. 必要に応じて node-version / run-eval を書き換える
+#      (run-eval: true にすると eval/run-eval.sh(G2)を CI 内でも回す)
+#   4. 重量レーン(変異試験・G1)は self-hosted ランナー登録までは
+#      workflow_dispatch の手動実行のみで使う
+#      (devbase/.github/workflows/mutation.yml 参照。夜間ローカルが正)
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gate:
+    uses: suratth/devbase/.github/workflows/quality-gate.yml@main
+    with:
+      node-version: "22"
+      run-eval: false
+
+  mutation:
+    if: github.event_name == 'workflow_dispatch'
+    uses: suratth/devbase/.github/workflows/mutation.yml@main
+    with:
+      runner: self-hosted

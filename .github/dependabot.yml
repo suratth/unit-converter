@@ -1,0 +1,16 @@
+# devbase 共通 dependabot テンプレート
+#
+# 使い方: このファイルを consumer リポの .github/dependabot.yml にコピーする。
+# npm と github-actions の依存を weekly で更新チェックする。
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
