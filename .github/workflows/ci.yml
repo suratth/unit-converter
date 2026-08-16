@@ -40,8 +40,10 @@ jobs:
         run: |
           command -v shellcheck >/dev/null || { echo "shellcheck なし=飛ばす"; exit 0; }
           find . -path ./node_modules -prune -o -path ./.git -prune -o -name '*.sh' -print0 | xargs -0 -r shellcheck -S error
-      - name: gitleaks(G9)
+      - name: gitleaks(G9。fail-closed)
+        # `-q` は存在しないフラグ・`&& echo` は errexit 対象外で、旧版は検知ゼロのまま緑だった
+        # (ADR-132 の実測4)。正本 quality-gate.yml と同じ直し方で揃える。
         run: |
           curl -sL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz | tar xz gitleaks
-          ./gitleaks git -q --no-banner --exit-code 1 . && echo "G9 秘密漏洩なし"
-          rm -f gitleaks
+          ./gitleaks git --no-banner --log-level error --exit-code 1 .
+          echo "G9 秘密漏洩なし"
