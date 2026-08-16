@@ -17,24 +17,17 @@
   README-package 型の章立てへ整形(内容無改変・全角括弧→半角)・`docs/decisions/`(ADR-001+
   INDEX)・`docs/unit-converter/design/ARCHITECTURE.md`(3-C)・`.devbase` 札・`eval/run-eval.sh`
   シム+`eval/criteria.md`+既存テストを1本(`eval/checks/10-npm-test.sh`=U1)に包んだ検査
-  (変異試験付き。検知1/取りこぼし0/変異せず0)。`bash eval/run-eval.sh` は OK85/警告1/NG2
-  (NG2件は devbase 側 F16a に由来する既知の未対応。詳細は下記「残作業」)。
+  (変異試験付き。検知1/取りこぼし0/変異せず0)。新設直後は `bash eval/run-eval.sh` OK85/警告1/NG2
+  (NG2件は devbase 側チェック F16a が `scripts/dev-stop-hook.sh`〔旧バトン配線パターン〕を
+  要求していたことに由来。consumer-stop-hook.sh 経由の衛星リポ全般に共通する devbase 側の
+  取り残しと判定し、台帳へ申し送った)。**同日、devbase 側 commit `b35b1b4` で F16a が
+  `$DEVBASE/scripts/dev-stop-hook.sh` を見るよう修正され解消**。再実行で **OK95/警告0/NG0**。
   `CONFORM_ROOT=~/projects/unit-converter bash ~/projects/devbase/eval/checks/105-conformance.sh`
   は F34a〜e 全 OK。
 
 ## 残作業
 
-（空。新規要件が来るまで無し。下記は申し送りのみ。）
-
-**devbase 側 F16a の未対応(申し送り)**: `bash eval/run-eval.sh` の NG2件は、いずれも devbase 側
-検査 `eval/checks/75-dev-relay.sh`(F16a)が `scripts/dev-stop-hook.sh`(旧バトン配線パターン)の
-存在+特定の実装パターンを要求することに由来する。devbase 自身の `scripts/consumer-stop-hook.sh`
-冒頭コメントは「dev-stop-hook.sh は devbase 自身専用、それ以外の consumer は全部
-consumer-stop-hook.sh を使う」と明記しており、このリポの Stop hook も実際に
-consumer-stop-hook.sh を使っている(F34b/F34e で確認済み)。F16a は旧配線パターンの取り残しで、
-consumer-stop-hook.sh 経由の衛星リポ全般(ssp-research・livetr・rpg-overlay・local-llm-assist)に
-共通して起きる。このリポの範囲(T3)を超える devbase 側修正が要るため、対症のダミーファイル設置は
-せず未対応のまま記録した(ssp-research の WORK-STATE.md にも同内容を記録済み)。
+（空。新規要件が来るまで無し。）
 
 ## 参照(再開時のヒント)
 
