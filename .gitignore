@@ -3,3 +3,6 @@ npm-debug.log*
 .DS_Store
 *.log
 .claude/
+
+# 評価ハーネスの走行結果(devbase 共通コアが生成。走るたび増えるので追跡しない)
+eval/results/
