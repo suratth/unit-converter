@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0(G10 SHA ピン)
         with:
-          node-version: "22"
+          node-version: "24"
       - name: 依存導入(package.json がある場合のみ)
         run: |
           if [ -f package-lock.json ]; then npm ci; elif [ -f package.json ]; then npm install; else echo "package.json なし"; fi
