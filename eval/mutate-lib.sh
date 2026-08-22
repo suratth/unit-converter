@@ -18,6 +18,8 @@
 #   try "名前" 33-modes.sh  m lib/modes.js '元の文字列' '置き換える文字列'
 #   mut_done
 set -u
+# 対象の指し方: 相対= $ROOT 起点(従来) / 絶対= そのまま使う(A-0 第2段: devbase と consumer に跨る試験のため)
+mut_path(){ case "$1" in /*) printf '%s' "$1";; *) printf '%s' "$ROOT/$1";; esac; }
 PASS=0; FAIL=0; DEAD=0
 MUT_TARGETS=""
 MUT_BK=""
@@ -32,15 +34,15 @@ mut_init(){ # 触るファイルを全部渡す(空白区切り)
   MUT_TMP="$(mktemp -d)"
   local f
   for f in $MUT_TARGETS; do
-    [ -f "$ROOT/$f" ] || { echo "  変異試験を始められない: $f が無い"; exit 1; }
-    cp "$ROOT/$f" "$MUT_BK/$(echo "$f" | tr / _)"
+    [ -f "$(mut_path "$f")" ] || { echo "  変異試験を始められない: $f が無い"; exit 1; }
+    cp "$(mut_path "$f")" "$MUT_BK/$(echo "$f" | tr / _)"
   done
   trap 'mut_restore; rm -rf "$MUT_BK" "$MUT_TMP"' EXIT
 }
 
 mut_restore(){
   local f
-  for f in $MUT_TARGETS; do cp "$MUT_BK/$(echo "$f" | tr / _)" "$ROOT/$f"; done
+  for f in $MUT_TARGETS; do cp "$MUT_BK/$(echo "$f" | tr / _)" "$(mut_path "$f")"; done
   rm -f "$ROOT"/tools/*.off "$ROOT"/lib/*.off
 }
 
@@ -48,8 +50,8 @@ mut_restore(){
 mut_changed(){
   local f
   for f in $MUT_TARGETS; do
-    [ -f "$ROOT/$f" ] || return 0
-    cmp -s "$ROOT/$f" "$MUT_BK/$(echo "$f" | tr / _)" || return 0
+    [ -f "$(mut_path "$f")" ] || return 0
+    cmp -s "$(mut_path "$f")" "$MUT_BK/$(echo "$f" | tr / _)" || return 0
   done
   return 1
 }
@@ -63,7 +65,7 @@ s = io.open(p, encoding="utf-8").read()
 if a not in s:
     sys.stderr.write("mutate: 模様が見つからない: " + a + "\n"); sys.exit(3)
 io.open(p, "w", encoding="utf-8").write(s.replace(a, b, 1))
-' "$ROOT/$1" "$2" "$3"
+' "$(mut_path "$1")" "$2" "$3"
 }
 
 # ファイル 元の文字列 置き換える文字列。**在る分だけ全部**置き換える。
@@ -83,7 +85,7 @@ s = io.open(p, encoding="utf-8").read()
 if a not in s:
     sys.stderr.write("mutate: 模様が見つからない: " + a + "\n"); sys.exit(3)
 io.open(p, "w", encoding="utf-8").write(s.replace(a, b))
-' "$ROOT/$1" "$2" "$3"
+' "$(mut_path "$1")" "$2" "$3"
 }
 
 # 変異をいくつも重ねる。三つ組(ファイル 元 新)を -- で区切って並べる。
@@ -118,7 +120,11 @@ try(){ # 名前 期待して落ちる検査 変異コマンド…
   if ! mut_changed; then
     echo "  変異せず    $name  (ファイルが変わっていない。検査ではなく治具の壊れ)"; DEAD=$((DEAD+1)); mut_restore; return
   fi
-  if bash "$ROOT/eval/checks/$check" >/dev/null 2>&1; then
+  # 検査の所在: consumer に無ければ devbase 側(A-0 第2段=共通検査の移送先)を見る
+  local chkpath="$ROOT/eval/checks/$check"
+  case "$check" in /*) chkpath="$check";; esac
+  [ -f "$chkpath" ] || chkpath="${DEVKIT:-$HOME/projects/devkit}/eval/checks/$check"
+  if bash "$chkpath" >/dev/null 2>&1; then
     echo "  取りこぼし  $name  ($check が通ってしまった)"; FAIL=$((FAIL+1))
   else
     echo "  検知        $name  ($check)"; PASS=$((PASS+1))
@@ -200,5 +206,16 @@ try_silent(){
 
 mut_done(){
   echo "  ---- 検知 $PASS / 取りこぼし $FAIL / 変異せず $DEAD"
+  # 実走の台帳(ADR-010 残穴「変異数の自己申告」対策・2026-08-22)。報告の「変異 N/N」の
+  # 根拠を eval/results/mutation-log.tsv に残し、F48(119-mutation-log.sh)が stamp 再計算と
+  # 鮮度(検査を直した後に回したか)を照合する。式は平文にある=完全ではないが、
+  # printf 一発の偽造では stamp が合わない(N11f・run-eval 実行証明と同型のコスト上げ)。
+  local mroot mhead mline mstamp
+  mroot="${ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+  mhead=$(git -C "$mroot" rev-parse HEAD 2>/dev/null || echo nohead)
+  mline="$(date -Iseconds)	$(basename "$0")	$PASS	$FAIL	$DEAD	$mhead"
+  mstamp=$(printf '%b\n' "$mline" | sha1sum | cut -c1-16)
+  mkdir -p "$mroot/eval/results" 2>/dev/null && \
+    printf '%b\t%s\n' "$mline" "$mstamp" >> "$mroot/eval/results/mutation-log.tsv" 2>/dev/null || true
   [ "$FAIL" -eq 0 ] && [ "$DEAD" -eq 0 ]
 }
