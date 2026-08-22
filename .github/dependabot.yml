@@ -9,8 +9,12 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7  # G10: 出たての版を 7 日寝かせる(supply-chain の鮮度攻撃対策)
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7  # G10: 出たての版を 7 日寝かせる(supply-chain の鮮度攻撃対策)
