@@ -1,0 +1,4 @@
+# この家の名札(規定 R-HOUSE-001)。名前と役割だけを持ち、場所は名簿(~/.config/devhome/houses.tsv)が持つ。
+# 役割で「名指ししてよい相手」が決まる(検査 F57 が見る)。
+name=unit-converter
+role=利用
