@@ -2,6 +2,18 @@
 # 各チェックが共通で使う道具。判定は必ず ok / ng / warn / info のどれかで出す。
 # 出力の先頭2文字で run-eval.sh が集計するので、自前の echo で判定を書かないこと。
 OK=0; NG=0; WARN=0
+# 家の場所を**名前で**引く(パスの直書きをやめるための道具。2026-08-23)。
+# 名簿= ~/.config/devhome/houses.tsv(machine-local。どのリポの持ち物でもない)。
+# 引けない時は空を返す=呼び手が fail-closed か既定へ倒せる。
+house_path() {
+  local reg="${DEVHOME_REGISTRY:-$HOME/.config/devhome/houses.tsv}"
+  local root="${DEVHOME_ROOT:-$HOME/${DEVHOME_DIR:-projects}}"
+  [ -f "$reg" ] || return 1
+  local rel; rel=$(awk -F'\t' -v n="$1" '$1==n {print $2; exit}' "$reg")
+  [ -n "$rel" ] || return 1
+  case "$rel" in /*) printf '%s' "$rel" ;; *) printf '%s/%s' "$root" "$rel" ;; esac
+}
+
 ok()   { echo "  OK   $*"; OK=$((OK+1)); }
 ng()   { echo "  NG   $*"; NG=$((NG+1)); }
 warn() { echo "  警告 $*"; WARN=$((WARN+1)); }
