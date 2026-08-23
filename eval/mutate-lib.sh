@@ -123,7 +123,7 @@ try(){ # 名前 期待して落ちる検査 変異コマンド…
   # 検査の所在: consumer に無ければ devbase 側(A-0 第2段=共通検査の移送先)を見る
   local chkpath="$ROOT/eval/checks/$check"
   case "$check" in /*) chkpath="$check";; esac
-  [ -f "$chkpath" ] || chkpath="${DEVKIT:-$HOME/projects/devkit}/eval/checks/$check"
+  [ -f "$chkpath" ] || chkpath="${DEVKIT:-$HOME/projects/supply/devkit}/eval/checks/$check"
   if bash "$chkpath" >/dev/null 2>&1; then
     echo "  取りこぼし  $name  ($check が通ってしまった)"; FAIL=$((FAIL+1))
   else

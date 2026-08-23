@@ -11,7 +11,7 @@
   `test/cli.test.js`)。
 - **CI 配線**: `.github/workflows/ci.yml`(public リポ自己完結版=構文チェック・shellcheck・
   gitleaks)・`.github/dependabot.yml`(週次)。
-- **devbase 標準適用(A-2・2026-08-16。台帳 `~/projects/devbase/docs/history/satellite-conformance-2026-08-16.md`
+- **devbase 標準適用(A-2・2026-08-16。台帳 `~/projects/supply/devbase/docs/history/satellite-conformance-2026-08-16.md`
   T3)**: 構造選定 ADR(レイヤード最軽量)・`docs/charter.md`・`docs/requirements.md`(R-001〜R-007。
   既存 README の機能を抽出・受け入れ基準=既存テスト名/CI)・`AGENTS.md`・`README.md` を
   README-package 型の章立てへ整形(内容無改変・全角括弧→半角)・`docs/decisions/`(ADR-001+
@@ -22,7 +22,7 @@
   要求していたことに由来。consumer-stop-hook.sh 経由の衛星リポ全般に共通する devbase 側の
   取り残しと判定し、台帳へ申し送った)。**同日、devbase 側 commit `b35b1b4` で F16a が
   `$DEVBASE/scripts/dev-stop-hook.sh` を見るよう修正され解消**。再実行で **OK95/警告0/NG0**。
-  `CONFORM_ROOT=~/projects/unit-converter bash ~/projects/devbase/eval/checks/105-conformance.sh`
+  `CONFORM_ROOT=~/projects/apps/unit-converter bash ~/projects/supply/devbase/eval/checks/105-conformance.sh`
   は F34a〜e 全 OK。
 
 ## 残作業

@@ -1,7 +1,7 @@
 # 静的品質ゲート(G3 eslint / G4 jscpd / G5 shellcheck)のラチェット基準。
 # 悪化(実測 > 基準)= NG。改善(実測 < 基準)= 警告で「締めよ」と言う。
 # 締め方: 実測が下がったらこの数字をその値へ下げて一行コミット。上げるのは悪化の白状=原則しない。
-# 数え方の正本 = ~/projects/devkit/eval/checks/108-static-gates.sh(F36)。
+# 数え方の正本 = ~/projects/supply/devkit/eval/checks/108-static-gates.sh(F36)。
 # targets = 母集団(リポ根からの相対ディレクトリ・空白区切り)。eval/ と state/ は入れない。
 # 2026-08-22 初回実測(devkit/templates/setup-static-gates.sh)。一斉リフォームはせずラチェットで守る。
 targets=src
