@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devkit.local/schemas/eval-face.schema.json",
+  "title": "検査の面(家が外へ出す機械可読の読み取り専用の面)",
+  "$comment": "版 1.0.0 / 正本: この文書(雛形が配る種。直す時は雛形へ還流する) / 規定: devrules R-HOUSE-009",
+  "description": "家が外へ出す状態を機械可読の形で一つだけ持つ。人向けの eval/results/latest.txt と**同じ走行から生成**し、人は書かない。読む側は様式だけを頼りに読み、平文を正規表現で削らない。totals は latest.txt の集計と一致しなければならない(一致しない面は古い写しなので読まない)。",
+  "x-instances": [
+    "eval/results/latest.json"
+  ],
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["face", "version", "house", "head", "stamp", "generated_from", "totals", "findings"],
+  "properties": {
+    "face": {
+      "const": "eval-face",
+      "description": "面の識別子。家をまたいで同じ名前を使う(受け渡し台帳 contract/faces.tsv の name と揃える)。"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "面の様式の版。読む側は major が上がったら読み方を確かめる。"
+    },
+    "house": {
+      "type": "string",
+      "minLength": 1,
+      "description": "この面を出した家の名前(.house が正本。名簿と同じ綴り)。"
+    },
+    "head": {
+      "type": "string",
+      "minLength": 1,
+      "description": "走行時の git HEAD。nohead は git の外で走ったことを表す。"
+    },
+    "stamp": {
+      "type": "string",
+      "minLength": 1,
+      "description": "走行の証明(latest.txt 末尾の stamp と同じ値)。面と平文が同じ走行から出たことをこれで照合する。"
+    },
+    "generated_from": {
+      "const": "eval/results/latest.txt",
+      "description": "この面の出どころ。人が書く面ではないことを形として言う。"
+    },
+    "totals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ok", "warn", "ng"],
+      "description": "判定の集計。latest.txt の集計行と一致すること。",
+      "properties": {
+        "ok": { "type": "integer", "minimum": 0 },
+        "warn": { "type": "integer", "minimum": 0 },
+        "ng": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "指摘(警告と NG)だけを並べる。OK は数だけで足り、並べると面が本文の写しになる。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "tag", "message"],
+        "properties": {
+          "kind": { "enum": ["警告", "NG"], "description": "指摘の重さ。" },
+          "tag": {
+            "type": "string",
+            "pattern": "^[A-Za-z]+\\d+[a-z]?$",
+            "description": "検査の札(F28l・N6 等)。束ねる時の指紋の片側になる。"
+          },
+          "message": { "type": "string", "minLength": 1, "description": "指摘の文言。可変値を含んでよい(束ねる側が雛形化する)。" }
+        }
+      }
+    }
+  }
+}
