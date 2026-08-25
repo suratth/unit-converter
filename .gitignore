@@ -6,3 +6,6 @@ npm-debug.log*
 
 # 評価ハーネスの走行結果(devbase 共通コアが生成。走るたび増えるので追跡しない)
 eval/results/
+
+# 並走監査(spotter)の印と走行ログ。機械ローカルで、走るたびに変わる
+.spotter/
